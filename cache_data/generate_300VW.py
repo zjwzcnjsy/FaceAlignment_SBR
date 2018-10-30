@@ -8,6 +8,7 @@ import numpy as np
 import math, os, pdb, sys, glob
 from os import path as osp
 from pathlib import Path
+import argparse
 lib_dir = (Path(__file__).parent / '..' / 'lib').resolve()
 if str(lib_dir) not in sys.path: sys.path.insert(0, str(lib_dir))
 assert sys.version_info.major == 3, 'Please upgrade from {:} to Python 3.x'.format(sys.version_info)
@@ -115,12 +116,13 @@ def generate_300vw_list(root, save_dir):
   load_video_dir(root, test_3_dirs, save_dir, '300VW.test-3.lst')
 
 if __name__ == '__main__':
-  HOME_STR = 'DOME_HOME'
-  if HOME_STR not in os.environ: HOME_STR = 'HOME'
-  assert HOME_STR in os.environ, 'Doest not find the HOME dir : {}'.format(HOME_STR)
+  paser = argparse.ArgumentParser('300vw')
+  paser.add_argument('-d', '--dir', type=str, required=True, help='300vw dir')
+  args = paser.parse_args()
+  assert osp.isdir(args.dir), 'path {} does not exist!'.format(args.dir)
 
   this_dir = osp.dirname(os.path.abspath(__file__))
   SAVE_DIR = osp.join(this_dir, 'lists', '300VW')
-  print ('This dir : {}, HOME : [{}] : {}'.format(this_dir, HOME_STR, os.environ[HOME_STR]))
-  path_300vw = osp.join(os.environ[HOME_STR], 'datasets', 'landmark-datasets', '300VW_Dataset_2015_12_14')
+  print ('This dir : {}, 300VW : {}'.format(this_dir, args.dir))
+  path_300vw = args.dir
   generate_300vw_list(path_300vw, SAVE_DIR)

@@ -1,7 +1,5 @@
 # Dataset Preparation
-The raw dataset should be put into the `$HOME/datasets/landmark-datasets`. The layout should be organized as the following screen shot.
-
-![layout](https://github.com/facebookresearch/supervision-by-registration/blob/master/cache_data/cache/dir-layout.png)
+The raw dataset should be put into the `<path-to-datasets>`. 
 
 ## [300-W](https://ibug.doc.ic.ac.uk/resources/300-W/)
 
@@ -13,7 +11,7 @@ The raw dataset should be put into the `$HOME/datasets/landmark-datasets`. The l
 - To download helen: https://ibug.doc.ic.ac.uk/download/annotations/helen.zip
 - To download lfpw: https://ibug.doc.ic.ac.uk/download/annotations/lfpw.zip
 - To download the bounding box annotations: https://ibug.doc.ic.ac.uk/media/uploads/competitions/bounding_boxes.zip
-- In the folder of `~/datasets/landmark-datasets/300W`, there are four zip files ibug.zip, afw.zip, helen.zip, and lfpw.zip
+- In the folder of `<path-to-datasets>/300W`, there are four zip files ibug.zip, afw.zip, helen.zip, and lfpw.zip
 ```
 unzip ibug.zip -d ibug
 mv ibug/image_092\ _01.jpg ibug/image_092_01.jpg
@@ -24,7 +22,7 @@ unzip helen.zip -d helen
 unzip lfpw.zip -d lfpw
 unzip bounding_boxes.zip ; mv Bounding\ Boxes Bounding_Boxes
 ```
-The 300W directory is in `$HOME/datasets/landmark-datasets/300W` and the structure is:
+The 300W directory is in `<path-to-datasets>/300W` and the structure is:
 ```
 -- afw
 -- Bounding_boxes
@@ -35,7 +33,7 @@ The 300W directory is in `$HOME/datasets/landmark-datasets/300W` and the structu
 
 Then you use the script to generate the 300-W list files.
 ```
-python generate_300W.py
+python generate_300W.py -d <path-to-datasets>/300W
 ```
 All list files will be saved into `./lists/300W/`. The files `*.DET` use the face detecter results for face bounding box. `*.GTB` use the ground-truth results for face bounding box.
 
@@ -44,14 +42,14 @@ The download link is in the official [300-W website](https://ibug.doc.ic.ac.uk/r
 ```
 https://ibug.doc.ic.ac.uk/media/uploads/competitions/bounding_boxes.zip
 ```
-The zip file should be unzipped, and all extracted mat files should be put into `$HOME/datasets/landmark-datasets/300W/Bounding_Boxes`.
+The zip file should be unzipped, and all extracted mat files should be put into `<path-to-datasets>/300W/Bounding_Boxes`.
 
 ## [AFLW](https://www.tugraz.at/institute/icg/research/team-bischof/lrs/downloads/aflw/)
 
-Download the aflw.tar.gz file in `$HOME/datasets/landmark-datasets` and extract it by `tar xzvf aflw.tar.gz`.
+Download the aflw.tar.gz file in `<path-to-datasets>` and extract it by `tar xzvf aflw.tar.gz`.
 ```
-mkdir $HOME/datasets/landmark-datasets/AFLW
-cp -r aflw/data/flickr $HOME/datasets/landmark-datasets/AFLW/images
+mkdir <path-to-datasets>/AFLW
+cp -r aflw/data/flickr <path-to-datasets>/AFLW/images
 ```
 
 The structure of AFLW is:
@@ -66,21 +64,21 @@ Download the [AFLWinfo_release.mat](http://mmlab.ie.cuhk.edu.hk/projects/composi
 
 Generate the AFLW dataset list file into `./lists/AFLW`.
 ```
-python aflw_from_mat.py
+python aflw_from_mat.py -d <path-to-datasets>/AFLW
 ```
 
 ## [300VW](https://ibug.doc.ic.ac.uk/resources/300-VW/)
-Download `300VW_Dataset_2015_12_14.zip` into `$HOME/datasets/landmark-datasets` and unzip it into `$HOME/datasets/landmark-datasets/300VW_Dataset_2015_12_14`.
+Download `300VW_Dataset_2015_12_14.zip` into `<path-to-datasets>` and unzip it into `<path-to-datasets>/300VW_Dataset_2015_12_14`.
 
 Use the following command to extract the raw video into the image format.
 ```
-python extrct_300VW.py
+python extrct_300VW.py -d <path-to-datasets>/300VW_Dataset_2015_12_14
 sh ./cache/Extract300VW.sh
 ```
 
 Generate the 300-VW dataset list file.
 ```
-python generate_300VW.py
+python generate_300VW.py -d <path-to-datasets>/300VW_Dataset_2015_12_14
 ```
 
 ## a short demo video sequence

@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 import os, pdb, sys, glob
+import argparse
 from os import path as osp
 
 def generate_extract_300vw(P300VW):
@@ -31,6 +32,8 @@ def generate_extract_300vw(P300VW):
   txtfile.close()
 
 if __name__ == '__main__':
-  HOME = 'DOME_HOME' if 'DOME_HOME' in os.environ else 'HOME'
-  P300VW = osp.join(os.environ[HOME], 'datasets', 'landmark-datasets', '300VW_Dataset_2015_12_14')
-  generate_extract_300vw(P300VW)
+  paser = argparse.ArgumentParser('300vw')
+  paser.add_argument('-d', '--dir', type=str, required=True, help='300vw dir')
+  args = paser.parse_args()
+  assert osp.isdir(args.dir), 'path {} does not exist!'.format(args.dir)
+  generate_extract_300vw(args.dir)

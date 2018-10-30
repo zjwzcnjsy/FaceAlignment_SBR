@@ -7,6 +7,7 @@
 import sys, sqlite3
 import os, math
 import os.path as osp
+import argparse
 from pathlib import Path
 import copy
 import numpy as np
@@ -19,13 +20,15 @@ import datasets
 #Change this paths according to your directories
 this_dir = osp.dirname(os.path.abspath(__file__))
 SAVE_DIR = osp.join(this_dir, 'lists', 'AFLW')
-HOME_STR = 'DOME_HOME'
-if HOME_STR not in os.environ: HOME_STR = 'HOME'
-assert HOME_STR in os.environ, 'Doest not find the HOME dir : {}'.format(HOME_STR)
-print ('This dir : {}, HOME : [{}] : {}'.format(this_dir, HOME_STR, os.environ[HOME_STR]))
+paser = argparse.ArgumentParser('aflw')
+paser.add_argument('-d', '--dir', type=str, required=True, help='aflw dir')
+args = paser.parse_args()
+assert osp.isdir(args.dir), 'path {} does not exist!'.format(args.dir)
+
+print ('This dir : {}, AFLW : {}'.format(this_dir, args.dir))
 if not osp.isdir(SAVE_DIR): os.makedirs(SAVE_DIR)
-image_dir = osp.join(os.environ[HOME_STR], 'datasets', 'landmark-datasets', 'AFLW', 'images')
-annot_dir = osp.join(os.environ[HOME_STR], 'datasets', 'landmark-datasets', 'AFLW', 'annotations')
+image_dir = osp.join(args.dir, 'images')
+annot_dir = osp.join(args.dir, 'annotations')
 print ('AFLW image dir : {}'.format(image_dir))
 print ('AFLW annotation dir : {}'.format(annot_dir))
 assert osp.isdir(image_dir), 'The image dir : {} does not exist'.format(image_dir)

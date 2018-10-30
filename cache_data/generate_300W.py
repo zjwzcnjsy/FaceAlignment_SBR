@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 import os, pdb, sys, glob
+import argparse
 from os import path as osp
 from pathlib import Path
 lib_dir = (Path(__file__).parent / '..' / 'lib').resolve()
@@ -129,13 +130,15 @@ def generate_300w_list(root, save_dir, box_data, SUFFIX):
   txtfile.close()
 
 if __name__ == '__main__':
-  HOME_STR = 'DOME_HOME'
-  if HOME_STR not in os.environ: HOME_STR = 'HOME'
-  assert HOME_STR in os.environ, 'Doest not find the HOME dir : {}'.format(HOME_STR)
+  paser = argparse.ArgumentParser('300w')
+  paser.add_argument('-d', '--dir', type=str, required=True, help='300w dir')
+  args = paser.parse_args()
+  assert osp.isdir(args.dir), 'path {} does not exist!'.format(args.dir)
+
   this_dir = osp.dirname(os.path.abspath(__file__))
   SAVE_DIR = osp.join(this_dir, 'lists', '300W')
-  print ('This dir : {}, HOME : [{}] : {}'.format(this_dir, HOME_STR, os.environ[HOME_STR]))
-  path_300w = osp.join( os.environ[HOME_STR], 'datasets', 'landmark-datasets', '300W')
+  print ('This dir : {}, 300W : {}'.format(this_dir, args.dir))
+  path_300w = args.dir
   USE_BOXES = ['GTB', 'DET']
   box_datas = load_all_300w(path_300w)
 
