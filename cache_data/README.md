@@ -24,7 +24,7 @@ unzip helen.zip -d helen
 unzip lfpw.zip -d lfpw
 unzip bounding_boxes.zip ; mv Bounding\ Boxes Bounding_Boxes
 ```
-The 300W directory is in `$HOME/datasets/landmark-datasets/300W` and the sturecture is:
+The 300W directory is in `$HOME/datasets/landmark-datasets/300W` and the structure is:
 ```
 -- afw
 -- Bounding_boxes
