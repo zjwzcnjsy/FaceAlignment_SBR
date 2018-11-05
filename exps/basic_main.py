@@ -17,7 +17,7 @@ lib_dir = (Path(__file__).parent / '..' / 'lib').resolve()
 if str(lib_dir) not in sys.path: sys.path.insert(0, str(lib_dir))
 assert sys.version_info.major == 3, 'Please upgrade from {:} to Python 3.x'.format(sys.version_info)
 from config_utils import obtain_basic_args
-from procedure import prepare_seed, save_checkpoint, basic_train as train, basic_eval_all as eval_all
+from procedure import prepare_seed, save_checkpoint, basic_train, basic_train_regression, basic_eval_all, basic_eval_all_regression
 from datasets import GeneralDataset as Dataset
 from xvision import transforms
 from log_utils import Logger, AverageMeter, time_for_file, convert_secs2time, time_string
@@ -92,7 +92,10 @@ def main(args):
 
   # Define network
   logger.log('configure : {:}'.format(model_config))
-  net = obtain_model(model_config, args.num_pts + 1)
+  if args.regression:
+    net = obtain_model(model_config, args.num_pts)
+  else:
+    net = obtain_model(model_config, args.num_pts + 1)
   assert model_config.downsample == net.downsample, 'downsample is not correct : {} vs {}'.format(model_config.downsample, net.downsample)
   logger.log("=> network :\n {}".format(net))
 
@@ -149,7 +152,11 @@ def main(args):
     logger.log('\n==>>{:s} [{:s}], [{:s}], LR : [{:.5f} ~ {:.5f}], Config : {:}'.format(time_string(), epoch_str, need_time, min(LRs), max(LRs), opt_config))
 
     # train for one epoch
-    train_loss, train_nme = train(args, train_loader, net, criterion, optimizer, epoch_str, logger, opt_config)
+    if args.regression:
+      train_loss, train_nme = basic_train_regression(args, train_loader, net, criterion, optimizer, epoch_str, logger, opt_config)
+    else:
+      train_loss, train_nme = basic_train(args, train_loader, net, criterion, optimizer, epoch_str, logger, opt_config)
+
     # log the results    
     logger.log('==>>{:s} Train [{:}] Average Loss = {:.6f}, NME = {:.2f}'.format(time_string(), epoch_str, train_loss, train_nme*100))
 
@@ -168,7 +175,10 @@ def main(args):
           'last_checkpoint': save_path,
           }, logger.last_info(), logger)
 
-    eval_results = eval_all(args, eval_loaders, net, criterion, epoch_str, logger, opt_config)
+    if args.regression:
+        eval_results = basic_eval_all_regression(args, eval_loaders, net, criterion, epoch_str, logger, opt_config)
+    else:
+        eval_results = basic_eval_all(args, eval_loaders, net, criterion, epoch_str, logger, opt_config)
     
     # measure elapsed time
     epoch_time.update(time.time() - start_time)

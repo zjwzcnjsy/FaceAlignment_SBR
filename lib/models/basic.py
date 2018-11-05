@@ -6,10 +6,13 @@
 #
 from .cpm_vgg16 import cpm_vgg16
 from .LK import LK
+from .mobilenetv2 import MobileNetV2
 
 def obtain_model(configure, points):
   if configure.arch == 'cpm_vgg16':
     net = cpm_vgg16(configure, points)
+  elif configure.arch == 'MobileNetV2':
+    net = MobileNetV2(configure, points)
   else:
     raise TypeError('Unkonw type : {:}'.format(configure.arch))
   return net

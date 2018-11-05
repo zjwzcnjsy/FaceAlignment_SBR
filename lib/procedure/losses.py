@@ -24,6 +24,15 @@ def compute_stage_loss(criterion, targets, outputs, masks):
   return total_loss, each_stage_loss
 
 
+def compute_regression_loss(criterion, target, output, mask):
+  selected_output = torch.masked_select(output , mask)
+  selected_target = torch.masked_select(target, mask)
+
+  total_loss = criterion(output, target)
+  return total_loss
+
+
+
 def show_stage_loss(each_stage_loss):
   if each_stage_loss is None:            return 'None'
   elif isinstance(each_stage_loss, str): return each_stage_loss

@@ -14,6 +14,7 @@ def obtain_args():
   parser.add_argument('--num_pts',          type=int,                   help='Number of point.')
   parser.add_argument('--model_config',     type=str,                   help='The path to the model configuration')
   parser.add_argument('--opt_config',       type=str,                   help='The path to the optimizer configuration')
+  parser.add_argument('--regression', action='store_true', help='using regression net')
   # Data Generation
   parser.add_argument('--heatmap_type',     type=str,   choices=['gaussian','laplacian'], help='The method for generating the heatmap.')
   parser.add_argument('--data_indicator',   type=str, default='300W-68',help='The method for generating the heatmap.')
