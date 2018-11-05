@@ -18,7 +18,7 @@ if str(lib_dir) not in sys.path: sys.path.insert(0, str(lib_dir))
 assert sys.version_info.major == 3, 'Please upgrade from {:} to Python 3.x'.format(sys.version_info)
 from config_utils import obtain_basic_args
 from procedure import prepare_seed, save_checkpoint, basic_train, basic_train_regression, basic_eval_all, basic_eval_all_regression
-from datasets import GeneralDataset as Dataset
+from datasets import GeneralDataset, GeneralDatasetForRegression
 from xvision import transforms
 from log_utils import Logger, AverageMeter, time_for_file, convert_secs2time, time_string
 from config_utils import load_configure
@@ -67,7 +67,10 @@ def main(args):
   logger.log('Real Sigma : {:}'.format(args.sigma))
 
   # Training Dataset
-  train_data   = Dataset(train_transform, args.sigma, model_config.downsample, args.heatmap_type, args.data_indicator)
+  if args.regression:
+    train_data   = GeneralDatasetForRegression(train_transform, args.data_indicator)
+  else:
+    train_data   = GeneralDataset(train_transform, args.sigma, model_config.downsample, args.heatmap_type, args.data_indicator)
   train_data.load_list(args.train_lists, args.num_pts, True)
   train_loader = torch.utils.data.DataLoader(train_data, batch_size=args.batch_size, shuffle=True, num_workers=args.workers, pin_memory=True)
 
@@ -76,7 +79,10 @@ def main(args):
   eval_loaders = []
   if args.eval_vlists is not None:
     for eval_vlist in args.eval_vlists:
-      eval_vdata = Dataset(eval_transform, args.sigma, model_config.downsample, args.heatmap_type, args.data_indicator)
+      if args.regression:
+        eval_vdata = GeneralDatasetForRegression(eval_transform, args.data_indicator)
+      else:
+        eval_vdata = GeneralDataset(eval_transform, args.sigma, model_config.downsample, args.heatmap_type, args.data_indicator)
       eval_vdata.load_list(eval_vlist, args.num_pts, True)
       eval_vloader = torch.utils.data.DataLoader(eval_vdata, batch_size=args.batch_size, shuffle=False,
                                                  num_workers=args.workers, pin_memory=True)
@@ -84,7 +90,10 @@ def main(args):
 
   if args.eval_ilists is not None:
     for eval_ilist in args.eval_ilists:
-      eval_idata = Dataset(eval_transform, args.sigma, model_config.downsample, args.heatmap_type, args.data_indicator)
+      if args.regression:
+        eval_idata = GeneralDatasetForRegression(eval_transform, args.data_indicator)
+      else:
+        eval_idata = GeneralDataset(eval_transform, args.sigma, model_config.downsample, args.heatmap_type, args.data_indicator)
       eval_idata.load_list(eval_ilist, args.num_pts, True)
       eval_iloader = torch.utils.data.DataLoader(eval_idata, batch_size=args.batch_size, shuffle=False,
                                                  num_workers=args.workers, pin_memory=True)

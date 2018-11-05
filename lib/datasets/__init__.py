@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 from .GeneralDataset import GeneralDataset
+from .GeneralDatasetForRegression import GeneralDatasetForRegression
 from .VideoDataset import VideoDataset
 from .dataset_utils import pil_loader
 from .point_meta import Point_Meta

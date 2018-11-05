@@ -38,17 +38,16 @@ def basic_eval(args, loader, net, criterion, epoch_str, logger, opt_config):
   criterion.eval()
 
   end = time.time()
-  for i, (inputs, target, mask, points, image_index, nopoints, cropped_size) in enumerate(loader):
+  for i, (inputs, mask, points, image_index, nopoints, cropped_size) in enumerate(loader):
     # inputs : Batch, Channel, Height, Width
     image_index = image_index.numpy().squeeze(1).tolist()
     batch_size, num_pts = inputs.size(0), args.num_pts
-    visible_point_num   = float(np.sum(mask.numpy()[:,:-1,:,:])) / batch_size
+    visible_point_num   = float(np.sum(mask.numpy()[:,:-1,:])) / batch_size
     visible_points.update(visible_point_num, batch_size)
     nopoints    = nopoints.numpy().squeeze(1).tolist()
     annotated_num = batch_size - sum(nopoints)
 
     points = points[:, :, :2].contiguous()
-    mask = mask[:, :num_pts].contiguous()
 
     # measure data loading time
     points = points.cuda(non_blocking=True)
@@ -60,9 +59,7 @@ def basic_eval(args, loader, net, criterion, epoch_str, logger, opt_config):
     forward_time.update(time.time() - end)
 
     if annotated_num > 0:
-      loss = compute_regression_loss(criterion, points, batch_locs, mask.view(batch_size, num_pts, 1))
-      if opt_config.lossnorm:
-        loss = loss / annotated_num
+      loss = compute_regression_loss(criterion, points, batch_locs, mask)
       # measure accuracy and record loss
       losses.update(loss.item(), batch_size)
     else:
