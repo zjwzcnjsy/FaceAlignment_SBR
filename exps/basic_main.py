@@ -46,7 +46,7 @@ def main(args):
   mean_fill   = tuple( [int(x*255) for x in [0.485, 0.456, 0.406] ] )
   normalize   = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                       std=[0.229, 0.224, 0.225])
-  assert args.arg_flip == False, 'The flip is : {}, rotate is {}'.format(args.arg_flip, args.rotate_max)
+  print('The flip is : {}, rotate is {}'.format(args.arg_flip, args.rotate_max))
   train_transform  = [transforms.PreCrop(args.pre_crop_expand)]
   train_transform += [transforms.TrainScale2WH((args.crop_width, args.crop_height))]
   train_transform += [transforms.AugScale(args.scale_prob, args.scale_min, args.scale_max)]

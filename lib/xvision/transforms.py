@@ -238,6 +238,57 @@ class PreCrop(object):
     return imgs, point_meta
 
 
+class AspectRatioReservePreCrop(object):
+  """Crops the given PIL.Image at the center.
+
+  Args:
+    size (sequence or int): Desired output size of the crop. If size is an
+      int instead of sequence like (w, h), a square crop (size, size) is
+      made.
+  """
+
+  def __init__(self, expand_ratio):
+    assert expand_ratio is None or isinstance(expand_ratio, numbers.Number), 'The expand_ratio should not be {}'.format(expand_ratio)
+    if expand_ratio is None:
+      self.expand_ratio = 0
+    else:
+      self.expand_ratio = expand_ratio
+    assert self.expand_ratio >= 0, 'The expand_ratio should not be {}'.format(expand_ratio)
+
+  def __call__(self, imgs, point_meta):
+    ## AugCrop has something wrong... For unsupervised data
+
+    if isinstance(imgs, list): is_list = True
+    else:                      is_list, imgs = False, [imgs]
+
+    w, h = imgs[0].size
+    box = point_meta.get_box().tolist()
+    face_ex_w, face_ex_h = (box[2] - box[0]) * self.expand_ratio, (box[3] - box[1]) * self.expand_ratio
+    x1, y1 = box[0]-face_ex_w, box[1]-face_ex_h
+    x2, y2 = box[2]+face_ex_w, box[3]+face_ex_h
+    w1 = x2 - x1 + 1
+    h1 = y2 - y1 + 1
+    if w1 > h1:
+      shift = (w1 - h1) / 2.
+      y1 -= shift
+      y2 += shift
+    else:
+      shift = (h1 - w1) / 2.
+      x1 -= shift
+      x2 += shift
+
+    x1, y1 = int(max(math.floor(x1), 0)), int(max(math.floor(y1), 0))
+    x2, y2 = int(min(math.ceil(x2), w)), int(min(math.ceil(y2), h))
+    
+    imgs = [ img.crop((x1, y1, x2, y2)) for img in imgs ]
+    point_meta.set_precrop_wh( imgs[0].size[0], imgs[0].size[1], x1, y1, x2, y2)
+    point_meta.apply_offset(-x1, -y1)
+    point_meta.apply_bound(imgs[0].size[0], imgs[0].size[1])
+
+    if is_list == False: imgs = imgs[0]
+    return imgs, point_meta
+
+
 class AugScale(object):
   """Rescale the input PIL.Image to the given size.
 
