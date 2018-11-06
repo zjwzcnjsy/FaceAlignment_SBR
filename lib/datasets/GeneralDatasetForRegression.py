@@ -147,11 +147,9 @@ class GeneralDatasetForRegression(data.Dataset):
       points = torch.from_numpy(np.zeros((self.NUM_PTS,3))).type(torch.FloatTensor)
       Hpoint = np.zeros((3, self.NUM_PTS))
 
-    if nopoints == False: visiable = Hpoint[2, :].astype('bool')
-    else                : visiable = (Hpoint[2, :]*0).astype('bool')
-    mask = np.ones((1, Hpoint.shape[1]), dtype='float32')
-    mask[0]  = visiable
-    mask     = torch.from_numpy(mask.transpose((1, 0))).type(torch.ByteTensor)
+    if nopoints == False: visiable = Hpoint[2, :]
+    else                : visiable = Hpoint[2, :]*0
+    mask = torch.from_numpy(visiable.reshape(-1)).type(torch.FloatTensor)
   
     torch_index = torch.IntTensor([index])
     torch_nopoints = torch.ByteTensor( [ nopoints ] )

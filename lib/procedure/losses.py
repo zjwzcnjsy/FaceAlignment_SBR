@@ -25,10 +25,7 @@ def compute_stage_loss(criterion, targets, outputs, masks):
 
 
 def compute_regression_loss(criterion, target, output, mask):
-  selected_output = torch.masked_select(output , mask)
-  selected_target = torch.masked_select(target, mask)
-
-  total_loss = criterion(output, target)
+  total_loss = criterion(output, target, mask)
   return total_loss
 
 

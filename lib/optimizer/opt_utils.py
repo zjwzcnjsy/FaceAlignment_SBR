@@ -5,6 +5,33 @@
 # LICENSE file in the root directory of this source tree.
 #
 import torch
+import torch.nn as nn
+
+class PairLoss(nn.Module):
+    def __init__(self):
+        super(PairLoss, self).__init__()
+
+    def forward(self, x, y):
+        bs = x.size(0)
+        pred_shape = x.reshape(bs, -1, 2)  # (N, 5, 2)
+        target_shape = y.reshape(bs, -1, 2)  # (N, 5, 2)
+        diff_shape = pred_shape - target_shape  # (N, 5, 2)
+        dist = diff_shape.norm(dim=2)  # (N, 5)
+        loss = dist.mean(dim=1).mean()
+        return loss
+
+class MaskPairLoss(nn.Module):
+    def __init__(self):
+        super(MaskPairLoss, self).__init__()
+
+    def forward(self, x, y, mask):
+        bs = x.size(0)
+        pred_shape = x.reshape(bs, -1, 2)  # (N, 5, 2)
+        target_shape = y.reshape(bs, -1, 2)  # (N, 5, 2)
+        diff_shape = pred_shape - target_shape  # (N, 5, 2)
+        dist = diff_shape.norm(dim=2)  # (N, 5)
+        loss = (dist*mask).mean()
+        return loss
 
 def obtain_optimizer(params, config, logger):
   assert hasattr(config, 'optimizer'), 'Must have the optimizer attribute'
@@ -29,6 +56,16 @@ def obtain_optimizer(params, config, logger):
     size_average = strs[1].lower() == 'avg'
     criterion = torch.nn.MSELoss(size_average)
     message = 'Optimizer : {:}, MSE Loss with size-average={:}'.format(opt, size_average)
+    if logger is not None: logger.log(message)
+    else                 : print(message)
+  elif strs[0].lower() == 'pairloss':
+    criterion = PairLoss()
+    message = 'Optimizer : {:}, PairLoss'.format(opt)
+    if logger is not None: logger.log(message)
+    else                 : print(message)
+  elif strs[0].lower() == 'maskpairloss':
+    criterion = MaskPairLoss()
+    message = 'Optimizer : {:}, MaskPairLoss'.format(opt)
     if logger is not None: logger.log(message)
     else                 : print(message)
   else:

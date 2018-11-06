@@ -5,13 +5,40 @@
 # LICENSE file in the root directory of this source tree.
 #
 import time, os
+from os import path as osp
 import numpy as np
+import cv2
 import torch
 from copy import deepcopy
 from pathlib import Path
 from xvision import Eval_Meta
 from log_utils import AverageMeter, time_for_file, convert_secs2time
 from .losses import compute_regression_loss
+import torchvision
+import visdom
+vis = None
+
+
+def plt_landmark(image, landmark, line_width=2, color=(255, 255, 255)):
+    image_copy = image.copy()
+    for x, y in landmark:
+        ix, iy = map(int, [x, y])
+        cv2.circle(image_copy, (ix, iy), line_width, color, line_width)
+    return image_copy
+
+
+def vis_plt(batch_image, points):
+    mean = batch_image.new_tensor([0.485, 0.456, 0.406]).view(-1, 3, 1, 1)
+    std = batch_image.new_tensor([0.229, 0.224, 0.225]).view(-1, 3, 1, 1)
+    images = batch_image * std + mean
+    images *= 255
+    images = images.numpy().transpose(0, 2, 3, 1).astype(np.int8)
+    landmark = points.numpy().astype(np.int32)
+    for i in range(images.shape[0]):
+        images[i] = plt_landmark(images[i], landmark[i], line_width=1, color=(255, 0, 0))
+    grid_images = torchvision.utils.make_grid(torch.from_numpy(images.transpose(0, 3, 1, 2).astype(np.float32)), nrow=8)
+    return grid_images
+
 
 # train function (forward, backward, update)
 def basic_train_regression(args, loader, net, criterion, optimizer, epoch_str, logger, opt_config):
@@ -25,26 +52,35 @@ def basic_train_regression(args, loader, net, criterion, optimizer, epoch_str, l
   net.train()
   criterion.train()
 
+  global vis
+  if vis is None:
+      vis = visdom.Visdom(env='{}'.format(osp.basename(args.model_config)))
+
   end = time.time()
   for i, (inputs, mask, points, image_index, nopoints, cropped_size) in enumerate(loader):
     # inputs : Batch, Channel, Height, Width
     image_index = image_index.numpy().squeeze(1).tolist()
     batch_size, num_pts = inputs.size(0), args.num_pts
-    visible_point_num   = float(np.sum(mask.numpy()[:,:-1,:])) / batch_size
+    visible_point_num   = float(np.sum(mask.numpy()[:,:-1])) / batch_size
     visible_points.update(visible_point_num, batch_size)
     nopoints    = nopoints.numpy().squeeze(1).tolist()
     annotated_num = batch_size - sum(nopoints)
     
     points = points[:, :, :2].contiguous()
-
+    if i % 100 == 0:
+        vis.image(vis_plt(inputs.cpu(), points), win='gt')
     # measure data loading time
     points = points.cuda(non_blocking=True)
     mask = mask.cuda(non_blocking=True)
     data_time.update(time.time() - end)
+    #  print('points.size(): ', points.size())
+    #  print('mask.size(): ', mask.size())
 
     # batch_heatmaps is a list for stage-predictions, each element should be [Batch, C, H, W]
     batch_predicts = net(inputs)
     forward_time.update(time.time() - end)
+    if i % 100 == 0:
+        vis.image(vis_plt(inputs.cpu(), batch_predicts.detach().cpu()), win='predict')
     
     loss = compute_regression_loss(criterion, points, batch_predicts, mask)
 

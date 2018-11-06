@@ -368,3 +368,28 @@ class AugRotate(object):
     if is_list == False: imgs = imgs[0]
 
     return imgs, point_meta
+
+class AugHorizontalFlip(object):
+    """Horizotal Flip the given PIL.Image
+    """
+
+    def __init__(self, flip_prob):
+        self.flip_prob = flip_prob
+
+    def __call__(self, imgs, point_meta):
+        point_meta = point_meta.copy()
+
+        dice = random.random()
+        if dice > self.flip_prob:
+            return imgs, point_meta
+
+        if isinstance(imgs, list): is_list = True
+        else:                      is_list, imgs = False, [imgs]
+
+        point_meta.apply_horizontal_flip(imgs[0].size[0])
+        imgs = [img.transpose(Image.FLIP_LEFT_RIGHT) for img in imgs]
+        
+        if is_list == False: imgs = imgs[0]
+
+        return imgs, point_meta
+

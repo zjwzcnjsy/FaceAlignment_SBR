@@ -114,6 +114,13 @@ class Point_Meta():
       ori = np.array([ 1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20])
       pos = np.array([ 3,  4,  1,  2,  9, 10, 11, 12,  5,  6,  7,  8, 14, 13, 15, 16, 17, 18, 19, 20])
       self.points[:, pos-1] = self.points[:, ori-1]
+    elif self.datasets == '300W-68':
+      ori = np.array(list(range(1, 69)))
+      pos = np.array([17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 27, 26, 25, 24, 23, 
+                      22, 21, 20, 19, 18, 28, 29, 30, 31, 36, 35, 34, 33, 32, 46, 45, 44, 43, 48, 47, 
+                      40, 39, 38, 37, 42, 41, 55, 54, 53, 52, 51, 50, 49, 60, 59, 58, 57, 56, 65, 64,
+                      63, 62, 61, 68, 67, 66])
+      self.points[:, pos-1] = self.points[:, ori-1]
     else:
       assert False, 'Does not support {}.{}'.format(self.datasets, self.subsets)
     

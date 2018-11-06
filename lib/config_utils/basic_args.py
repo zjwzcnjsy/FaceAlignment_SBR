@@ -14,7 +14,7 @@ def obtain_args():
   parser.add_argument('--num_pts',          type=int,                   help='Number of point.')
   parser.add_argument('--model_config',     type=str,                   help='The path to the model configuration')
   parser.add_argument('--opt_config',       type=str,                   help='The path to the optimizer configuration')
-  parser.add_argument('--regression', action='store_true', help='using regression net')
+  parser.add_argument('--regression',       action='store_true',        help='using regression net')
   # Data Generation
   parser.add_argument('--heatmap_type',     type=str,   choices=['gaussian','laplacian'], help='The method for generating the heatmap.')
   parser.add_argument('--data_indicator',   type=str, default='300W-68',help='The method for generating the heatmap.')
@@ -30,12 +30,13 @@ def obtain_args():
   parser.add_argument('--crop_width',       type=int,   default=256,    help='argument crop : crop width.')
   parser.add_argument('--crop_perturb_max', type=int,                   help='argument crop : center of maximum perturb distance.')
   parser.add_argument('--arg_flip',         action='store_true',        help='Using flip data argumentation or not ')
+  parser.add_argument('--flip_prob',        type=float, default=0.5,    help='flip prob')
   # Optimization options
   parser.add_argument('--eval_once',        action='store_true',        help='evaluation only once for evaluation ')
   parser.add_argument('--error_bar',        type=float,                 help='For drawing the image with large distance error.')
   parser.add_argument('--batch_size',       type=int,   default=2,      help='Batch size for training.')
   # Checkpoints
-  parser.add_argument('--print_freq',       type=int,   default=100,    help='print frequency (default: 200)')
+  parser.add_argument('--print_freq',       type=int,   default=10,    help='print frequency (default: 200)')
   parser.add_argument('--save_path',        type=str,                   help='Folder to save checkpoints and log.')
   # Acceleration
   parser.add_argument('--workers',          type=int,   default=8,      help='number of data loading workers (default: 2)')

@@ -42,7 +42,7 @@ def basic_eval(args, loader, net, criterion, epoch_str, logger, opt_config):
     # inputs : Batch, Channel, Height, Width
     image_index = image_index.numpy().squeeze(1).tolist()
     batch_size, num_pts = inputs.size(0), args.num_pts
-    visible_point_num   = float(np.sum(mask.numpy()[:,:-1,:])) / batch_size
+    visible_point_num   = float(np.sum(mask.numpy()[:,:-1])) / batch_size
     visible_points.update(visible_point_num, batch_size)
     nopoints    = nopoints.numpy().squeeze(1).tolist()
     annotated_num = batch_size - sum(nopoints)
